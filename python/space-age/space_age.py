@@ -28,31 +28,46 @@ class SpaceAge:
     }
 
     def __init__(self, seconds: int) -> None:
-        self._earth_years = seconds/self.SECONDS_PER_EARTH_YEAR
+        """
+        Calculate the age (in years) relative to planets orbital lengths.
 
-    def _get_planet_age(self, planet: Planet) -> float:
-        return round((self._earth_years / self.RELATIVE_ORBITAL_PERIODS_EARTH_YEARS[planet]), 2)
+        Args:
+            seconds: Number of seconds since birth.
+        """
+        self._earth_years = seconds/self.SECONDS_PER_EARTH_YEAR
+        self._relative_age: dict[Planet, float] = {
+            planet: round(self._earth_years / orbit_time_relative_to_earth, 2)
+            for planet, orbit_time_relative_to_earth in self.RELATIVE_ORBITAL_PERIODS_EARTH_YEARS.items()
+        }
     
     def on_mercury(self) -> float:
-        return self._get_planet_age(Planet.MERCURY)
+        """Relative age in years on mercury."""
+        return self._relative_age[Planet.MERCURY]
     
     def on_venus(self) -> float:
-        return self._get_planet_age(Planet.VENUS)
+        """Relative age in years on venus."""
+        return self._relative_age[Planet.VENUS]
 
     def on_earth(self) -> float:
-        return self._get_planet_age(Planet.EARTH)
+        """Relative age in years on earth."""
+        return self._relative_age[Planet.EARTH]
 
     def on_mars(self) -> float:
-        return self._get_planet_age(Planet.MARS)
+        """Relative age in years on mars."""
+        return self._relative_age[Planet.MARS]
     
     def on_jupiter(self) -> float:
-        return self._get_planet_age(Planet.JUPITER)
+        """Relative age in years on jupiter."""
+        return self._relative_age[Planet.JUPITER]
     
     def on_saturn(self) -> float:
-        return self._get_planet_age(Planet.SATURN)
+        """Relative age in years on saturn."""
+        return self._relative_age[Planet.SATURN]
 
     def on_uranus(self) -> float:
-        return self._get_planet_age(Planet.URANUS)
+        """Relative age in years on uranus."""
+        return self._relative_age[Planet.URANUS]
     
     def on_neptune(self) -> float:
-        return self._get_planet_age(Planet.NEPTUNE)
+        """Relative age in years on neptune."""
+        return self._relative_age[Planet.NEPTUNE]
