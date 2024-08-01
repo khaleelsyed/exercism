@@ -1,14 +1,14 @@
 package summultiples
 
 func SumMultiples(limit int, divisors ...int) int {
-	sequenceChannel := make(chan []int)
-
 	validDivisors := make([]int, len(divisors))
 	for _, divisor := range divisors {
 		if divisor != 0 {
 			validDivisors = append(validDivisors, divisor)
 		}
 	}
+
+	sequenceChannel := make(chan []int, len(validDivisors))
 
 	for _, divisor := range validDivisors {
 		go generateSequenceOfMultiples(divisor, limit, sequenceChannel)
@@ -23,9 +23,9 @@ func SumMultiples(limit int, divisors ...int) int {
 	return sum(sequenceToSum)
 }
 
-func generateSequenceOfMultiples(divisor int, limit int, sequenceChannel chan []int) {
+func generateSequenceOfMultiples(divisor int, limit int, sequenceChannel chan<- []int) {
 	sequence := make([]int, limit)
-	for num := 0; num < limit; num++ {
+	for num := 1; num < limit; num++ {
 		if num%divisor == 0 {
 			sequence = append(sequence, num)
 		}
@@ -41,7 +41,7 @@ func sum(sequenceToSum []int) int {
 	return total
 }
 
-func transformToSingleDimension(sequenceChannel chan []int) []int {
+func transformToSingleDimension(sequenceChannel <-chan []int) []int {
 	unionMap := make(map[int]bool)
 
 	for sequence := range sequenceChannel {
