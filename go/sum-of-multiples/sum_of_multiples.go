@@ -1,23 +1,36 @@
 package summultiples
 
 func SumMultiples(limit int, divisors ...int) int {
-	sequenceOfMultiples := make([][]int, len(divisors))
-	for i := range divisors {
-		sequenceOfMultiples[i] = make([]int, 0)
+	sequenceChannel := make(chan []int)
+
+	validDivisors := make([]int, len(divisors))
+	for _, divisor := range divisors {
+		if divisor != 0 {
+			validDivisors = append(validDivisors, divisor)
+		}
 	}
 
-	for i, divisor := range divisors {
-		if divisor == 0 {
-			continue
-		}
-		for num := 0; num < limit; num++ {
-			if num%divisor == 0 {
-				sequenceOfMultiples[i] = append(sequenceOfMultiples[i], num)
-			}
+	for _, divisor := range validDivisors {
+		go generateSequenceOfMultiples(divisor, limit, sequenceChannel)
+	}
+
+	for {
+		if len(sequenceChannel) == len(validDivisors) {
+			break
 		}
 	}
-	sequenceToSum := transformToSingleDimension(sequenceOfMultiples)
+	sequenceToSum := transformToSingleDimension(sequenceChannel)
 	return sum(sequenceToSum)
+}
+
+func generateSequenceOfMultiples(divisor int, limit int, sequenceChannel chan []int) {
+	sequence := make([]int, limit)
+	for num := 0; num < limit; num++ {
+		if num%divisor == 0 {
+			sequence = append(sequence, num)
+		}
+	}
+	sequenceChannel <- sequence
 }
 
 func sum(sequenceToSum []int) int {
@@ -28,13 +41,12 @@ func sum(sequenceToSum []int) int {
 	return total
 }
 
-func transformToSingleDimension(sequenceOfMultiples [][]int) []int {
+func transformToSingleDimension(sequenceChannel chan []int) []int {
 	unionMap := make(map[int]bool)
 
-	for divisor := range sequenceOfMultiples {
-		sequences := sequenceOfMultiples[divisor]
-		for _, element := range sequences {
-			unionMap[element] = true
+	for sequence := range sequenceChannel {
+		for _, value := range sequence {
+			unionMap[value] = true
 		}
 	}
 
